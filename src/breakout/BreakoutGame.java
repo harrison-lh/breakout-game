@@ -27,16 +27,51 @@ public class BreakoutGame extends GameWorld{
         primaryStage.setTitle(getWindowTitle());
 
         setSceneNodes(new Group());
-        setGameSurface(new Scene(getSceneNodes(), 640, 580));
+        setGameSurface(new Scene(getSceneNodes(), 720, 720));
         primaryStage.setScene(getGameSurface());
 
+        addBall();
+
         final Timeline gameloop = getGameLoop();
+
+
+    }
+    private void addBall() {
+        Scene gameSurface = getGameSurface();
+        Ball ball = new Ball();
+        Circle circle = ball.getAsCircle();
+
+        circle.setTranslateX(360);
+        circle.setTranslateY(200);
+        circle.setVisible(true);
+        //ball.setId(b.toString());
+
+        ball.setXVelocity(2);
+        ball.setYVelocity(2);
+
+        getSpriteManager().addSprites(ball);
+        getSceneNodes().getChildren().add(0, ball.node);
 
 
     }
 
     @Override
     protected void handleUpdate(Sprite sprite) {
-        super.handleUpdate(sprite);
+        if (sprite instanceof Ball) {
+            Ball sphere = (Ball) sprite;
+
+            sphere.update();
+
+            if (sphere.node.getTranslateX() > (getGameSurface().getWidth()  -
+                    sphere.node.getBoundsInParent().getWidth()/2.0) ||
+                    sphere.node.getTranslateX() < sphere.node.getBoundsInParent().getWidth()/2.0 ) {
+                sphere.xVelocity = sphere.xVelocity * -1;
+            }
+            if (sphere.node.getTranslateY() > getGameSurface().getHeight()-
+                    sphere.node.getBoundsInParent().getHeight()/2.0 ||
+                    sphere.node.getTranslateY() < sphere.node.getBoundsInParent().getWidth()/2.0) {
+                sphere.yVelocity = sphere.yVelocity * -1;
+            }
+        }
     }
 }
