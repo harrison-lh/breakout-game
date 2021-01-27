@@ -2,15 +2,15 @@
 
 This project implements the game of Breakout.
 
-Name: 
+Name: Harrison Huang
 
 ### Timeline
 
-Start Date: 
+Start Date: 1/26/21
 
-Finish Date: 
+Finish Date:
 
-Hours Spent:
+Hours Spent: 2+1+
 
 ### Resources Used
 
