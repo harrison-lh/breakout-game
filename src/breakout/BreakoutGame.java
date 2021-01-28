@@ -1,5 +1,6 @@
 package breakout;
 
+import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import java.util.Random;
 import javafx.animation.Timeline;
@@ -17,6 +18,8 @@ import static javafx.animation.Animation.Status.STOPPED;
 
 public class BreakoutGame extends GameWorld{
 
+    public Paddle paddle;
+
     public BreakoutGame(int fps, String title) {
         super(fps, title);
     }
@@ -30,27 +33,35 @@ public class BreakoutGame extends GameWorld{
         setGameSurface(new Scene(getSceneNodes(), 720, 720));
         primaryStage.setScene(getGameSurface());
 
-        addBall();
+        addBallAndPaddle();
 
         final Timeline gameloop = getGameLoop();
 
+        primaryStage.getScene().setOnKeyPressed(e -> handleKeyInput(e.getCode()));
 
     }
-    private void addBall() {
+    private void addBallAndPaddle() {
         Scene gameSurface = getGameSurface();
         Ball ball = new Ball();
         Circle circle = ball.getAsCircle();
 
         circle.setTranslateX(360);
         circle.setTranslateY(200);
-        circle.setVisible(true);
-        //ball.setId(b.toString());
+        //circle.setVisible(true);
+
 
         ball.setXVelocity(2);
         ball.setYVelocity(2);
 
         getSpriteManager().addSprites(ball);
         getSceneNodes().getChildren().add(0, ball.node);
+
+        paddle = new Paddle();
+        paddle.setXPos(360);
+        paddle.setYPos(650);
+
+        getSpriteManager().addSprites(paddle);
+        getSceneNodes().getChildren().add(0, paddle.node);
 
 
     }
@@ -72,6 +83,15 @@ public class BreakoutGame extends GameWorld{
                     sphere.node.getTranslateY() < sphere.node.getBoundsInParent().getWidth()/2.0) {
                 sphere.yVelocity = sphere.yVelocity * -1;
             }
+        }
+    }
+
+    private void handleKeyInput(KeyCode code) {
+        if (code == KeyCode.RIGHT) {
+            paddle.setXPos(paddle.getXPos() + 10);
+        }
+        else if (code == KeyCode.LEFT) {
+            paddle.setXPos(paddle.getXPos() - 10);
         }
     }
 }
