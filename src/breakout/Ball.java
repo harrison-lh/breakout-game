@@ -84,8 +84,24 @@ public class Ball extends Sprite{
 
     }
     public boolean collide(Block block) {
-        if ((withinRange(node.getTranslateX()+size,block.block.getX(),block.block.getX()+size) &&
-            withinRange(node.getTranslateY(),block.block.getY(),block.block.getX()+size/2))) {}
+        double xLeftBlock = block.block.getX();
+        double xRightBlock = block.block.getX()+block.size;
+        double yUpBlock = block.block.getY();
+        double yDownBlock = block.block.getY()+block.size/2;
+
+        double xL = node.getTranslateX();
+        double xR = node.getTranslateX() + size*2;
+        double yLR = node.getTranslateY() + size;
+        double yU = node.getTranslateY();
+        double yD = node.getTranslateY() + size*2;
+        double xUD = node.getTranslateX() + size;
+        if ((withinRange(xL,xLeftBlock,xRightBlock) && withinRange(yLR,yUpBlock,yDownBlock)) ||
+            (withinRange(xR,xLeftBlock,xRightBlock) && withinRange(yLR,yUpBlock,yDownBlock)) ||
+            (withinRange(xUD,xLeftBlock,xRightBlock) && withinRange(yU,yUpBlock,yDownBlock)) ||
+            (withinRange(xUD,xLeftBlock,xRightBlock) && withinRange(yD,yUpBlock,yDownBlock))) {
+            block.health--;
+                return true;
+        }
         return false;
     }
     private boolean withinRange(double point, double low, double high) {
