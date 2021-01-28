@@ -10,9 +10,12 @@ import javafx.util.Duration;
 
 public class Ball extends Sprite{
 
+    public double size;
+
     public Ball() {
         Circle ball = new Circle();
-        ball.setRadius(10);
+        size = 10;
+        ball.setRadius(size);
 
         node = ball;
     }
@@ -33,5 +36,26 @@ public class Ball extends Sprite{
     }
     public void setYVelocity(double v) {
         yVelocity = v;
+    }
+
+    @Override
+    public boolean collide(Sprite other) {
+        if (other instanceof Paddle) {
+            return collide((Paddle)other);
+        }
+        return false;
+    }
+
+    private boolean collide(Paddle paddle) {
+        double xCenter = node.getTranslateX()+size/2;
+        double yCenter = node.getTranslateY()+size/2;
+
+        if (paddle.xPos <= xCenter &&
+            xCenter <= paddle.xPos + paddle.size &&
+            paddle.yPos <= yCenter &&
+            yCenter <= paddle.yPos + paddle.size) {
+            return true;
+        }
+        return false;
     }
 }

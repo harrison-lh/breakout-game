@@ -19,6 +19,9 @@ import static javafx.animation.Animation.Status.STOPPED;
 public class BreakoutGame extends GameWorld{
 
     public Paddle paddle;
+    private static final int PADDLE_SPEED = 30;
+    private static final double WINDOW_WIDTH = 720;
+    private static final double WINDOW_HEIGHT = 720;
 
     public BreakoutGame(int fps, String title) {
         super(fps, title);
@@ -30,7 +33,7 @@ public class BreakoutGame extends GameWorld{
         primaryStage.setTitle(getWindowTitle());
 
         setSceneNodes(new Group());
-        setGameSurface(new Scene(getSceneNodes(), 720, 720));
+        setGameSurface(new Scene(getSceneNodes(), WINDOW_WIDTH, WINDOW_HEIGHT));
         primaryStage.setScene(getGameSurface());
 
         addBallAndPaddle();
@@ -50,8 +53,8 @@ public class BreakoutGame extends GameWorld{
         //circle.setVisible(true);
 
 
-        ball.setXVelocity(2);
-        ball.setYVelocity(2);
+        ball.setXVelocity(3);
+        ball.setYVelocity(3);
 
         getSpriteManager().addSprites(ball);
         getSceneNodes().getChildren().add(0, ball.node);
@@ -59,6 +62,7 @@ public class BreakoutGame extends GameWorld{
         paddle = new Paddle();
         paddle.setXPos(360);
         paddle.setYPos(650);
+        paddle.setSize(100);
 
         getSpriteManager().addSprites(paddle);
         getSceneNodes().getChildren().add(0, paddle.node);
@@ -88,10 +92,26 @@ public class BreakoutGame extends GameWorld{
 
     private void handleKeyInput(KeyCode code) {
         if (code == KeyCode.RIGHT) {
-            paddle.setXPos(paddle.getXPos() + 10);
+            paddle.setXPos(Math.min(
+                    (int)(getGameSurface().getWidth()-paddle.size),
+                    paddle.getXPos() + PADDLE_SPEED));
         }
         else if (code == KeyCode.LEFT) {
-            paddle.setXPos(paddle.getXPos() - 10);
+            paddle.setXPos(Math.max(0, paddle.getXPos() - PADDLE_SPEED));
         }
+    }
+
+    @Override
+    protected boolean handleCollision(Sprite spriteA, Sprite spriteB) {
+        if (spriteA.collide(spriteB)) {
+            if (spriteA instanceof Paddle && spriteB instanceof Ball) {
+                ((Ball)spriteB).setYVelocity(-1 * (spriteB.yVelocity));
+            }
+            else if (spriteA instanceof Ball && spriteB instanceof Paddle) {
+                ((Ball)spriteA).setYVelocity(-1 * (spriteA.yVelocity));
+            }
+            return true;
+        }
+        return false;
     }
 }
