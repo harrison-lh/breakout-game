@@ -9,7 +9,7 @@ public class Block extends Sprite{
     private final static String BRICK_IMAGE = "brick3.gif";
     public double xPos, yPos;
     public double size;
-    ImageView block;
+    private ImageView block;
 
     public Block(int health, double x, double y) {
         this.health = health;
@@ -32,8 +32,12 @@ public class Block extends Sprite{
 
     @Override
     public void update() {
-        if (health==0) {
+        if (health<=0) {
             isDead = true;
         }
+    }
+
+    public ImageView getBlock() {
+        return block;
     }
 }

@@ -94,6 +94,10 @@ public class BreakoutGame extends GameWorld{
                 sphere.yVelocity = sphere.yVelocity * -1;
             }
         }
+        if (sprite.isDead) {
+            getSpriteManager().addSpritesToBeRemoved(sprite);
+        }
+        cleanupSprites();
     }
 
     private void handleKeyInput(KeyCode code) {
@@ -127,6 +131,12 @@ public class BreakoutGame extends GameWorld{
                 else {
                     ((Ball)spriteA).setXVelocity(-1 * Math.abs(spriteA.xVelocity));
                 }
+            }
+            else if (spriteA instanceof Ball && spriteB instanceof Block) {
+                ((Block)spriteB).health--;
+            }
+            else if (spriteB instanceof Ball && spriteA instanceof Block) {
+                ((Block)spriteA).health--;
             }
             return true;
         }

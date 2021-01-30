@@ -9,7 +9,7 @@ public class Paddle extends Sprite{
     public double xPos;
     public double yPos;
     public double size;
-    ImageView paddle;
+    private ImageView paddle;
 
     public Paddle() {
         Image image = new Image(this.getClass().getClassLoader().getResourceAsStream(PADDLE_IMAGE));
@@ -45,5 +45,9 @@ public class Paddle extends Sprite{
     @Override
     public void update() {
 
+    }
+
+    public ImageView getPaddle() {
+        return paddle;
     }
 }
