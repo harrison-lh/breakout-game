@@ -134,6 +134,10 @@ public class BreakoutGame extends GameWorld{
             }
             else if (spriteA instanceof Ball && spriteB instanceof Block) {
                 ((Block)spriteB).health--;
+                if (((Block)spriteB).health<=0) {
+                    ((Block) spriteB).removeFromScene(this);
+                    getSpriteManager().addSpritesToBeRemoved(spriteB);
+                }
             }
             else if (spriteB instanceof Ball && spriteA instanceof Block) {
                 ((Block)spriteA).health--;

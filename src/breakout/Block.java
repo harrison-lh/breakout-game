@@ -32,12 +32,17 @@ public class Block extends Sprite{
 
     @Override
     public void update() {
-        if (health<=0) {
-            isDead = true;
-        }
+//        if (health<=0) {
+//            isDead = true;
+//        }
     }
 
     public ImageView getBlock() {
         return block;
+    }
+
+    public void removeFromScene(final GameWorld gameWorld) {
+        isDead = true;
+        gameWorld.getSceneNodes().getChildren().remove(node);
     }
 }
