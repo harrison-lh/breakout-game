@@ -52,16 +52,6 @@ public class Ball extends Sprite{
 
     private boolean collide(Paddle paddle) {
         return (paddle.getPaddle().intersects(ball.getBoundsInParent()));
-//        double xCenter = node.getTranslateX()+size/2;
-//        double yCenter = node.getTranslateY()+size/2;
-//
-//        if (paddle.xPos <= xCenter &&
-//            xCenter <= paddle.xPos + paddle.size &&
-//            paddle.yPos <= yCenter+size/2 &&
-//            yCenter-size/2 <= paddle.yPos + paddle.size/10) {
-//            return true;
-//        }
-//        return false;
     }
     public boolean collideXToRight(Paddle paddle) {
         double xCenter = node.getTranslateX()+size/2;
@@ -86,28 +76,7 @@ public class Ball extends Sprite{
 
     }
     public boolean collide(Block block) {
-//        double xLeftBlock = block.block.getX();
-//        double xRightBlock = block.block.getX()+block.size;
-//        double yUpBlock = block.block.getY();
-//        double yDownBlock = block.block.getY()+block.size/2;
-//
-//        double xL = node.getTranslateX();
-//        double xR = node.getTranslateX() + size*2;
-//        double yLR = node.getTranslateY() + size;
-//        double yU = node.getTranslateY();
-//        double yD = node.getTranslateY() + size*2;
-//        double xUD = node.getTranslateX() + size;
-//        if ((withinRange(xL,xLeftBlock,xRightBlock) && withinRange(yLR,yUpBlock,yDownBlock)) ||
-//            (withinRange(xR,xLeftBlock,xRightBlock) && withinRange(yLR,yUpBlock,yDownBlock)) ||
-//            (withinRange(xUD,xLeftBlock,xRightBlock) && withinRange(yU,yUpBlock,yDownBlock)) ||
-//            (withinRange(xUD,xLeftBlock,xRightBlock) && withinRange(yD,yUpBlock,yDownBlock))) {
-//            block.health--;
-//                return true;
-//        }
         return (block.getBlock().intersects(ball.getBoundsInParent()));
 
-    }
-    private boolean withinRange(double point, double low, double high) {
-        return (low <= point && point <= high);
     }
 }
