@@ -13,9 +13,9 @@ public class Block extends Sprite{
     private ImageView block;
     private PowerUp powerup;
 
-    public Block(int health, double x, double y, PowerUp powerup) {
+    public Block(int health, double x, double y, int powerupType) {
         this(health, x, y);
-        this.powerup = powerup;
+        powerup = new PowerUp(x + size/2 - 5, y + block.getFitHeight()*1/3, powerupType);
     }
 
     public Block(int health, double x, double y) {

@@ -35,7 +35,11 @@ public class BreakoutGame extends GameWorld{
     private KeyCode lastDirectionInput;
     private static final double TIME_TO_RESET_DIRECTION = 10;
     private double timeSinceDirection = TIME_TO_RESET_DIRECTION;
-    private static final double DIRECTION_ROTATION = Math.toRadians(10);
+    private static final double DIRECTION_ROTATION = Math.toRadians(15);
+
+    private boolean sizePowerupActive = false;
+    private static final int SIZE_POWERUP_TIME = 500;
+    private int sizePowerupTime = SIZE_POWERUP_TIME;
 
     public BreakoutGame(int fps, String title) {
         super(fps, title);
@@ -65,12 +69,11 @@ public class BreakoutGame extends GameWorld{
     private void addText() {
         livesText = new Text(10, 20, "Lives: "+remainingLives);
         livesText.setFont(new Font("Verdana", 10));
-        //getSpriteManager().addSprites(t);
+        
         getSceneNodes().getChildren().add(0, livesText);
     }
 
     private void addPaddle() {
-        Scene gameSurface = getGameSurface();
 
         paddle = new Paddle();
         paddle.setXPos(WINDOW_WIDTH/2);
@@ -102,8 +105,7 @@ public class BreakoutGame extends GameWorld{
         for (int i=0; i<5; i++) {
             for (int j = 0; j < 8; j++) {
                 if (i==3 && j==4) {
-                    PowerUp powerup = new PowerUp(75*j,75+37.5*i);
-                    blocks[8*3 + 4] = new Block(1,75*j,75+37.5*i, powerup);
+                    blocks[8*3 + 4] = new Block(1,75*j,75+37.5*i, 1);
                     getSpriteManager().addSprites(blocks[28].getPowerup());
                     getSceneNodes().getChildren().add(0, blocks[28].getPowerup().node);
                 }
@@ -157,6 +159,12 @@ public class BreakoutGame extends GameWorld{
         if (sprite instanceof Ball) {
             if (timeSinceDirection < TIME_TO_RESET_DIRECTION) timeSinceDirection++;
             else lastDirectionInput = null;
+
+            if (sizePowerupTime < SIZE_POWERUP_TIME) sizePowerupTime++;
+            else if (sizePowerupActive) {
+                sizePowerupActive = false;
+                paddle.setSize(paddle.getSize() / 1.5);
+            }
 
             Ball ball = (Ball) sprite;
 
@@ -254,7 +262,7 @@ public class BreakoutGame extends GameWorld{
         else if (ball.collidesRightSide(paddle)) {
             ball.setXVelocity(BALL_ACCELERATION * Math.abs(ball.xVelocity));
         }
-        if (lastDirectionInput != null) {
+        if (lastDirectionInput != null && ball.collidesUp(paddle)) {
             if (lastDirectionInput == KeyCode.LEFT) {
                 double newX = ball.xVelocity*Math.cos(-1 * DIRECTION_ROTATION) -
                         ball.yVelocity*Math.sin(-1 * DIRECTION_ROTATION);
@@ -295,5 +303,10 @@ public class BreakoutGame extends GameWorld{
     private void powerUpCollidesPaddle(PowerUp powerup, Paddle paddle) {
         getSpriteManager().addSpritesToBeRemoved(powerup);
         getSceneNodes().getChildren().remove(powerup.node);
+        if (powerup.type==1 && !sizePowerupActive) {
+            paddle.setSize(paddle.getSize() * 1.5);
+            sizePowerupActive = true;
+            sizePowerupTime = 0;
+        }
     }
 }
