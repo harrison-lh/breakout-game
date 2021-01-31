@@ -1,6 +1,8 @@
 package breakout;
 
 import javafx.scene.input.KeyCode;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import java.util.Random;
 import javafx.animation.Timeline;
@@ -21,6 +23,8 @@ public class BreakoutGame extends GameWorld{
     private Block[] blocks;
     private Paddle paddle;
     private int remainingLives = 5;
+    private Text livesText;
+
     private static final int PADDLE_SPEED = 30;
     private static final double WINDOW_WIDTH = 600;
     public static final double WINDOW_HEIGHT = 600;
@@ -31,7 +35,7 @@ public class BreakoutGame extends GameWorld{
     private KeyCode lastDirectionInput;
     private static final double TIME_TO_RESET_DIRECTION = 10;
     private double timeSinceDirection = TIME_TO_RESET_DIRECTION;
-    private static final double DIRECTION_ROTATION = Math.toRadians(7.5);
+    private static final double DIRECTION_ROTATION = Math.toRadians(10);
 
     public BreakoutGame(int fps, String title) {
         super(fps, title);
@@ -47,6 +51,7 @@ public class BreakoutGame extends GameWorld{
         setGameSurface(new Scene(getSceneNodes(), WINDOW_WIDTH, WINDOW_HEIGHT));
         primaryStage.setScene(getGameSurface());
 
+        addText();
         addPaddle();
         addBall();
         constructLevelOne();
@@ -56,6 +61,14 @@ public class BreakoutGame extends GameWorld{
         primaryStage.getScene().setOnKeyPressed(e -> handleKeyInput(e.getCode()));
 
     }
+
+    private void addText() {
+        livesText = new Text(10, 20, "Lives: "+remainingLives);
+        livesText.setFont(new Font("Verdana", 10));
+        //getSpriteManager().addSprites(t);
+        getSceneNodes().getChildren().add(0, livesText);
+    }
+
     private void addPaddle() {
         Scene gameSurface = getGameSurface();
 
@@ -104,6 +117,16 @@ public class BreakoutGame extends GameWorld{
 
     @Override
     protected void resetScene() {
+        getSceneNodes().getChildren().remove(livesText);
+        addText();
+
+        if (remainingLives <= 0) {
+            Text gameOver = new Text(WINDOW_WIDTH/4,WINDOW_HEIGHT/2, "Game Over");
+            gameOver.setFont(new Font("Verdana", 50));
+            getSceneNodes().getChildren().add(gameOver);
+            return;
+        }
+
         boolean needsBall = true;
         boolean needsBlocks = true;
         Ball ball = null;
@@ -126,6 +149,7 @@ public class BreakoutGame extends GameWorld{
             constructLevelOne();
             addBall();
         }
+
     }
 
     @Override
@@ -150,6 +174,7 @@ public class BreakoutGame extends GameWorld{
 
             if (ball.node.getTranslateY() + ball.radius >= WINDOW_HEIGHT + 100) {
                 getSpriteManager().addSpritesToBeRemoved(sprite);
+                remainingLives--;
             }
         }
         if (sprite instanceof PowerUp) {
@@ -160,7 +185,7 @@ public class BreakoutGame extends GameWorld{
             }
         }
         if (sprite instanceof Block) {
-            ((Block)sprite).update();
+            sprite.update();
         }
 
 
@@ -188,6 +213,9 @@ public class BreakoutGame extends GameWorld{
             else {
                 paddle.setXPos(Math.max(0, paddle.getXPos() - PADDLE_SPEED));
             }
+        }
+        else if (code == KeyCode.L && remainingLives>0) {
+            remainingLives++;
         }
     }
 
