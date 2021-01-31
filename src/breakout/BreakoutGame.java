@@ -18,10 +18,11 @@ import static javafx.animation.Animation.Status.STOPPED;
 
 public class BreakoutGame extends GameWorld{
 
-    public Paddle paddle;
+    private Paddle paddle;
     private static final int PADDLE_SPEED = 30;
     private static final double WINDOW_WIDTH = 600;
     private static final double WINDOW_HEIGHT = 600;
+    private static final double BALL_ACCELERATION = 1.02;
 
     public BreakoutGame(int fps, String title) {
         super(fps, title);
@@ -49,7 +50,7 @@ public class BreakoutGame extends GameWorld{
         Circle circle = ball.getAsCircle();
 
         circle.setTranslateX(WINDOW_WIDTH/2);
-        circle.setTranslateY(WINDOW_HEIGHT/4);
+        circle.setTranslateY(WINDOW_HEIGHT*3/4);
 
         ball.setXVelocity(3);
         ball.setYVelocity(3);
@@ -102,12 +103,21 @@ public class BreakoutGame extends GameWorld{
 
     private void handleKeyInput(KeyCode code) {
         if (code == KeyCode.RIGHT) {
-            paddle.setXPos(Math.min(
-                    (int)(getGameSurface().getWidth()-paddle.size),
-                    paddle.getXPos() + PADDLE_SPEED));
+            if (paddle.xPos >= getGameSurface().getWidth()-paddle.size) {
+                paddle.setXPos(0);
+            }
+            else {
+                paddle.setXPos(Math.min(
+                    getGameSurface().getWidth()-paddle.size,
+                    paddle.getXPos() + PADDLE_SPEED));}
         }
         else if (code == KeyCode.LEFT) {
-            paddle.setXPos(Math.max(0, paddle.getXPos() - PADDLE_SPEED));
+            if (paddle.xPos <= 0) {
+                paddle.setXPos(getGameSurface().getWidth()-paddle.size);
+            }
+            else {
+                paddle.setXPos(Math.max(0, paddle.getXPos() - PADDLE_SPEED));
+            }
         }
     }
 
@@ -115,35 +125,43 @@ public class BreakoutGame extends GameWorld{
     protected boolean handleCollision(Sprite spriteA, Sprite spriteB) {
         if (spriteA.collide(spriteB)) {
             if (spriteA instanceof Paddle && spriteB instanceof Ball) {
-                ((Ball)spriteB).setYVelocity(-1 * Math.abs(spriteB.yVelocity));
-                if (((Ball)spriteB).collideXToRight((Paddle)spriteA)) {
-                    ((Ball)spriteB).setXVelocity(Math.abs(spriteB.xVelocity));
-                }
-                else {
-                    ((Ball)spriteB).setXVelocity(-1 * Math.abs(spriteB.xVelocity));
-                }
+                ballCollidesPaddle((Ball)spriteB, (Paddle)spriteA);
             }
-            else if (spriteA instanceof Ball && spriteB instanceof Paddle) {
-                ((Ball)spriteA).setYVelocity(-1 * Math.abs(spriteA.yVelocity));
-                if (((Ball)spriteA).collideXToRight((Paddle)spriteB)) {
-                    ((Ball)spriteA).setXVelocity(Math.abs(spriteA.xVelocity));
-                }
-                else {
-                    ((Ball)spriteA).setXVelocity(-1 * Math.abs(spriteA.xVelocity));
-                }
+            else if (spriteB instanceof Paddle && spriteA instanceof Ball) {
+                ballCollidesPaddle((Ball)spriteA, (Paddle)spriteB);
             }
             else if (spriteA instanceof Ball && spriteB instanceof Block) {
-                ((Block)spriteB).health--;
-                if (((Block)spriteB).health<=0) {
-                    ((Block) spriteB).removeFromScene(this);
-                    getSpriteManager().addSpritesToBeRemoved(spriteB);
-                }
+                ballCollidesBlock((Ball)spriteA, (Block)spriteB);
             }
             else if (spriteB instanceof Ball && spriteA instanceof Block) {
-                ((Block)spriteA).health--;
+                ballCollidesBlock((Ball)spriteB, (Block)spriteA);
             }
             return true;
         }
         return false;
+    }
+    private void ballCollidesPaddle(Ball ball, Paddle paddle) {
+        if (ball.collidesUp(paddle)) {
+            ball.setYVelocity(-1.0 * BALL_ACCELERATION * Math.abs(ball.yVelocity));
+        }
+        if (ball.collidesLeftSide(paddle)) {
+            ball.setXVelocity(-1.0 * BALL_ACCELERATION * Math.abs(ball.xVelocity));
+        }
+        else if (ball.collidesRightSide(paddle)) {
+            ball.setXVelocity(BALL_ACCELERATION * Math.abs(ball.xVelocity));
+        }
+    }
+    private void ballCollidesBlock(Ball ball, Block block) {
+        if (ball.collidesX(block)) {
+            ball.setXVelocity(-1.0 * ball.xVelocity);
+        }
+        if (ball.collidesY(block)) {
+            ball.setYVelocity(-1.0 * ball.yVelocity);
+        }
+        block.health--;
+        if (block.health <= 0) {
+            block.removeFromScene(this);
+            getSpriteManager().addSpritesToBeRemoved(block);
+        }
     }
 }

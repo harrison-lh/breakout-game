@@ -12,6 +12,7 @@ public class Ball extends Sprite{
 
     public double size;
     private Circle ball;
+    private static final double TOLERANCE = 5;
 
     public Ball() {
         ball = new Circle();
@@ -53,30 +54,30 @@ public class Ball extends Sprite{
     private boolean collide(Paddle paddle) {
         return (paddle.getPaddle().intersects(ball.getBoundsInParent()));
     }
-    public boolean collideXToRight(Paddle paddle) {
-        double xCenter = node.getTranslateX()+size/2;
+    public boolean collidesUp(Paddle paddle) {
         double yCenter = node.getTranslateY()+size/2;
-
-        double paddleRadius = paddle.size/10;
-        double xLeftPaddleFocus = paddle.xPos + paddle.size/12;
-        double yLeftPaddleFocus = paddle.yPos + paddle.size/10;
-        double xRightPaddleFocus = paddle.xPos + paddle.size*11/12;
-        double yRightPaddleFocus = paddle.yPos + paddle.size/10;
-
-        if (Math.sqrt(Math.pow((xCenter - xLeftPaddleFocus),2) +
-                        Math.pow((yCenter - yLeftPaddleFocus),2)) >
-                (size + paddleRadius) ||
-            Math.sqrt(Math.pow((xCenter - xRightPaddleFocus),2) +
-                        Math.pow((yCenter - yRightPaddleFocus),2)) <=
-                (size + paddleRadius)) {
-            return true;
-        }
-        return false;
-
-
+        return (yCenter < paddle.yPos + paddle.getSize()/10);
     }
+    public boolean collidesLeftSide(Paddle paddle) {
+        double xCenter = node.getTranslateX()+size/2;
+        double xLeftPaddleFocus = paddle.xPos + paddle.size/12;
+        return (xCenter<xLeftPaddleFocus);
+    }
+    public boolean collidesRightSide(Paddle paddle) {
+        double xCenter = node.getTranslateX()+size/2;
+        double xRightPaddleFocus = paddle.xPos + paddle.size*11/12;
+        return (xCenter>xRightPaddleFocus);
+    }
+
     public boolean collide(Block block) {
         return (block.getBlock().intersects(ball.getBoundsInParent()));
-
+    }
+    public boolean collidesX(Block block) {
+        return (node.getTranslateX()+size <= block.xPos + TOLERANCE ||
+                node.getTranslateX() >= block.xPos+block.getBlock().getFitWidth() - TOLERANCE);
+    }
+    public boolean collidesY(Block block) {
+        return (node.getTranslateY()+size <= block.yPos + TOLERANCE ||
+                node.getTranslateY() >= block.yPos+block.getBlock().getFitHeight() - TOLERANCE);
     }
 }
