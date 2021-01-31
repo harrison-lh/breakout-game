@@ -6,6 +6,7 @@ import javafx.scene.image.ImageView;
 public class Block extends Sprite{
 
     public int health;
+    private final static double DEFAULT_SIZE = 75;
     private final static String BRICK_IMAGE = "brick3.gif";
     public double xPos, yPos;
     public double size;
@@ -22,7 +23,7 @@ public class Block extends Sprite{
         block.setX(x);
         block.setY(y);
 
-        setSize(70);
+        setSize(DEFAULT_SIZE);
     }
     public void setSize(double size) {
         this.size = size;
@@ -32,9 +33,9 @@ public class Block extends Sprite{
 
     @Override
     public void update() {
-//        if (health<=0) {
-//            isDead = true;
-//        }
+        if (health<=0) {
+            isDead = true;
+        }
     }
 
     public ImageView getBlock() {

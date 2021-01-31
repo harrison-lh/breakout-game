@@ -66,13 +66,23 @@ public class BreakoutGame extends GameWorld{
         getSpriteManager().addSprites(paddle);
         getSceneNodes().getChildren().add(0, paddle.node);
 
-        Block block = new Block(1, 200, 200);
-        Block block2 = new Block(1, 270, 200);
+        Block[] blocks = new Block[8*5];
+        for (int i=0; i<5; i++) {
+            for (int j=0; j<8; j++) {
+                blocks[8*i+j] = new Block(1, 75*j, 75+37.5*i);
+                if (i==0) blocks[8*i+j].health = 2;
+                getSpriteManager().addSprites(blocks[8*i+j]);
+                getSceneNodes().getChildren().add(0,blocks[8*i+j].node);
+            }
+        }
 
-        getSpriteManager().addSprites(block);
-        getSceneNodes().getChildren().add(0, block.node);
-        getSpriteManager().addSprites(block2);
-        getSceneNodes().getChildren().add(0, block2.node);
+//        Block block = new Block(1, 200, 200);
+//        Block block2 = new Block(1, 270, 200);
+//
+//        getSpriteManager().addSprites(block);
+//        getSceneNodes().getChildren().add(0, block.node);
+//        getSpriteManager().addSprites(block2);
+//        getSceneNodes().getChildren().add(0, block2.node);
 
 
     }
@@ -155,7 +165,7 @@ public class BreakoutGame extends GameWorld{
         if (ball.collidesX(block)) {
             ball.setXVelocity(-1.0 * ball.xVelocity);
         }
-        if (ball.collidesY(block)) {
+        else {
             ball.setYVelocity(-1.0 * ball.yVelocity);
         }
         block.health--;

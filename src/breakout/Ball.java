@@ -10,14 +10,14 @@ import javafx.util.Duration;
 
 public class Ball extends Sprite{
 
-    public double size;
+    public double radius;
     private Circle ball;
-    private static final double TOLERANCE = 5;
+    private static final double TOLERANCE = 2;
 
     public Ball() {
         ball = new Circle();
-        size = 10;
-        ball.setRadius(size);
+        radius = 10;
+        ball.setRadius(radius);
 
         node = ball;
     }
@@ -55,16 +55,16 @@ public class Ball extends Sprite{
         return (paddle.getPaddle().intersects(ball.getBoundsInParent()));
     }
     public boolean collidesUp(Paddle paddle) {
-        double yCenter = node.getTranslateY()+size/2;
+        double yCenter = node.getTranslateY()+radius;
         return (yCenter < paddle.yPos + paddle.getSize()/10);
     }
     public boolean collidesLeftSide(Paddle paddle) {
-        double xCenter = node.getTranslateX()+size/2;
+        double xCenter = node.getTranslateX()+radius;
         double xLeftPaddleFocus = paddle.xPos + paddle.size/12;
         return (xCenter<xLeftPaddleFocus);
     }
     public boolean collidesRightSide(Paddle paddle) {
-        double xCenter = node.getTranslateX()+size/2;
+        double xCenter = node.getTranslateX()+radius;
         double xRightPaddleFocus = paddle.xPos + paddle.size*11/12;
         return (xCenter>xRightPaddleFocus);
     }
@@ -73,11 +73,7 @@ public class Ball extends Sprite{
         return (block.getBlock().intersects(ball.getBoundsInParent()));
     }
     public boolean collidesX(Block block) {
-        return (node.getTranslateX()+size <= block.xPos + TOLERANCE ||
+        return (node.getTranslateX()+2*radius <= block.xPos + TOLERANCE ||
                 node.getTranslateX() >= block.xPos+block.getBlock().getFitWidth() - TOLERANCE);
-    }
-    public boolean collidesY(Block block) {
-        return (node.getTranslateY()+size <= block.yPos + TOLERANCE ||
-                node.getTranslateY() >= block.yPos+block.getBlock().getFitHeight() - TOLERANCE);
     }
 }
