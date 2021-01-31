@@ -50,10 +50,10 @@ public class BreakoutGame extends GameWorld{
         Circle circle = ball.getAsCircle();
 
         circle.setTranslateX(WINDOW_WIDTH/2);
-        circle.setTranslateY(WINDOW_HEIGHT*3/4);
+        circle.setTranslateY(WINDOW_HEIGHT/12);
 
         ball.setXVelocity(3);
-        ball.setYVelocity(3);
+        ball.setYVelocity(4);
 
         getSpriteManager().addSprites(ball);
         getSceneNodes().getChildren().add(0, ball.node);
@@ -76,34 +76,30 @@ public class BreakoutGame extends GameWorld{
             }
         }
 
-//        Block block = new Block(1, 200, 200);
-//        Block block2 = new Block(1, 270, 200);
-//
-//        getSpriteManager().addSprites(block);
-//        getSceneNodes().getChildren().add(0, block.node);
-//        getSpriteManager().addSprites(block2);
-//        getSceneNodes().getChildren().add(0, block2.node);
-
 
     }
 
     @Override
     protected void handleUpdate(Sprite sprite) {
         if (sprite instanceof Ball) {
-            Ball sphere = (Ball) sprite;
+            Ball ball = (Ball) sprite;
 
-            sphere.update();
+            ball.update();
 
-            if (sphere.node.getTranslateX() > (getGameSurface().getWidth()  -
-                    sphere.node.getBoundsInParent().getWidth()/2.0) ||
-                    sphere.node.getTranslateX() < sphere.node.getBoundsInParent().getWidth()/2.0 ) {
-                sphere.xVelocity = sphere.xVelocity * -1;
+            if (ball.node.getTranslateX() + ball.radius >= WINDOW_WIDTH) {
+                ball.xVelocity = -1.0 * Math.abs(ball.xVelocity);
             }
-            if (sphere.node.getTranslateY() > getGameSurface().getHeight()-
-                    sphere.node.getBoundsInParent().getHeight()/2.0 ||
-                    sphere.node.getTranslateY() < sphere.node.getBoundsInParent().getWidth()/2.0) {
-                sphere.yVelocity = sphere.yVelocity * -1;
+            else if (ball.node.getTranslateX() - ball.radius <= 0) {
+                ball.xVelocity = Math.abs(ball.xVelocity);
             }
+            if (ball.node.getTranslateY() - ball.radius < 0) {
+                ball.yVelocity = Math.abs(ball.yVelocity);
+            }
+            // Testing purposes only
+//            else if (ball.node.getTranslateY() + ball.radius >= WINDOW_HEIGHT) {
+//                ball.yVelocity = -1.0 * Math.abs(ball.yVelocity);
+//            }
+
         }
         if (sprite.isDead) {
             getSpriteManager().addSpritesToBeRemoved(sprite);
@@ -162,7 +158,8 @@ public class BreakoutGame extends GameWorld{
         }
     }
     private void ballCollidesBlock(Ball ball, Block block) {
-        if (ball.collidesX(block)) {
+        if (ball.collidesX(block) &&
+            (!ball.collidesY(block) || ball.collidesCornerX(block))) {
             ball.setXVelocity(-1.0 * ball.xVelocity);
         }
         else {
