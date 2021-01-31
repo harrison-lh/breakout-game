@@ -27,6 +27,7 @@ public class Ball extends Sprite{
     public void update() {
         node.setTranslateX(node.getTranslateX() + xVelocity);
         node.setTranslateY(node.getTranslateY() + yVelocity);
+
 //        radius *= 1.0001;
 //        ball.setRadius(radius);
     }

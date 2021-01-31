@@ -40,6 +40,8 @@ public abstract class GameWorld {
         final Duration oneFrameAmt = Duration.millis(1000/getFramesPerSecond());
         final KeyFrame keyFrame = new KeyFrame(oneFrameAmt,
                 (EventHandler) event -> {
+            
+                    resetScene();
 
                     // update actors
                     updateSprites();
@@ -57,6 +59,8 @@ public abstract class GameWorld {
         setGameLoop(timeline);
 
     }
+
+    protected abstract void resetScene();
 
     /**
      * Initialize the game world by update the JavaFX Stage.

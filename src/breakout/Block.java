@@ -11,6 +11,12 @@ public class Block extends Sprite{
     public double xPos, yPos;
     public double size;
     private ImageView block;
+    private PowerUp powerup;
+
+    public Block(int health, double x, double y, PowerUp powerup) {
+        this(health, x, y);
+        this.powerup = powerup;
+    }
 
     public Block(int health, double x, double y) {
         this.health = health;
@@ -35,6 +41,9 @@ public class Block extends Sprite{
     public void update() {
         if (health<=0) {
             isDead = true;
+            if (powerup != null) {
+                powerup.canMove = true;
+            }
         }
     }
 
@@ -42,7 +51,10 @@ public class Block extends Sprite{
         return block;
     }
 
+    public PowerUp getPowerup() { return powerup; }
+
     public void removeFromScene(final GameWorld gameWorld) {
+        update();
         isDead = true;
         gameWorld.getSceneNodes().getChildren().remove(node);
     }
