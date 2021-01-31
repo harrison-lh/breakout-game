@@ -20,6 +20,7 @@ public class BreakoutGame extends GameWorld{
 
     private Block[] blocks;
     private Paddle paddle;
+    private int remainingLives = 5;
     private static final int PADDLE_SPEED = 30;
     private static final double WINDOW_WIDTH = 600;
     public static final double WINDOW_HEIGHT = 600;
@@ -104,13 +105,27 @@ public class BreakoutGame extends GameWorld{
     @Override
     protected void resetScene() {
         boolean needsBall = true;
+        boolean needsBlocks = true;
+        Ball ball = null;
         for (Sprite sprite : getSpriteManager().getAllSprites()) {
             if (sprite instanceof Ball) {
                 needsBall = false;
-                break;
+                ball = (Ball)sprite;
             }
+            if (sprite instanceof Block) {
+                needsBlocks = false;
+            }
+            if (!needsBall && !needsBlocks) return;
         }
         if (needsBall) addBall();
+        if (needsBlocks) {
+            if (ball != null) {
+                getSpriteManager().removeSprites(ball);
+                getSceneNodes().getChildren().remove(ball.node);
+            }
+            constructLevelOne();
+            addBall();
+        }
     }
 
     @Override
@@ -132,13 +147,9 @@ public class BreakoutGame extends GameWorld{
             if (ball.node.getTranslateY() - ball.radius < 0) {
                 ball.yVelocity = Math.abs(ball.yVelocity);
             }
-            // Testing purposes only
-            else if (ball.node.getTranslateY() + ball.radius >= WINDOW_HEIGHT + 200) {
-                ball.yVelocity = -1.0 * Math.abs(ball.yVelocity);
-            }
+
             if (ball.node.getTranslateY() + ball.radius >= WINDOW_HEIGHT + 100) {
                 getSpriteManager().addSpritesToBeRemoved(sprite);
-                // need to add ball
             }
         }
         if (sprite instanceof PowerUp) {
