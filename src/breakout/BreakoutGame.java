@@ -107,6 +107,9 @@ public class BreakoutGame extends GameWorld{
                         getSpriteManager().addSprites(blocks[cols*i + j].getPowerup());
                         getSceneNodes().getChildren().add(0, blocks[cols*i + j].getPowerup().node);
                     }
+                    else if (i==2 && j==4) {
+                        blocks[cols * i + j] = new ExplodingBlock(2, 75 * j, 75 + 37.5 * i);
+                    }
                     else if ((i>=1 && i<=3) && (j>=2 && j<=5)) {
                         blocks[cols * i + j] = new Block(2, 75 * j, 75 + 37.5 * i);
                     }
@@ -202,8 +205,15 @@ public class BreakoutGame extends GameWorld{
         }
         if (needsBlocks) {
             if (ball != null) {
-                getSpriteManager().removeSprites(ball);
+                getSpriteManager().addSpritesToBeRemoved(ball);
                 getSceneNodes().getChildren().remove(ball.node);
+            }
+            for (Sprite sprite : getSpriteManager().getAllSprites()) {
+                if (sprite instanceof Laser || sprite instanceof PowerUp ||
+                    sprite instanceof Ball) {
+                    getSpriteManager().addSpritesToBeRemoved(sprite);
+                    getSceneNodes().getChildren().remove(sprite.node);
+                }
             }
             if (levelNum >= 3) {
                 Text gameOverText = new Text(WINDOW_WIDTH/4,WINDOW_HEIGHT/2-75, "You Win!");
@@ -236,6 +246,9 @@ public class BreakoutGame extends GameWorld{
             Ball ball = (Ball) sprite;
 
             ball.update();
+            if (levelNum >= 2) {
+                ball.incrementSize();
+            }
 
             if (ball.node.getTranslateX() + ball.radius >= WINDOW_WIDTH) {
                 ball.xVelocity = -1.0 * Math.abs(ball.xVelocity);
@@ -265,6 +278,12 @@ public class BreakoutGame extends GameWorld{
             sprite.update();
             if (((Laser)sprite).getLaser().getY() + ((Laser)sprite).getLaser().getHeight() < 0) {
                 getSpriteManager().addSpritesToBeRemoved(sprite);
+            }
+        }
+        if (sprite instanceof ExplodingBlock) {
+            if (((ExplodingBlock) sprite).isExploded()) {
+                getSpriteManager().addSpritesToBeRemoved(sprite);
+                getSceneNodes().getChildren().remove(sprite.node);
             }
         }
 
@@ -331,6 +350,12 @@ public class BreakoutGame extends GameWorld{
             }
             else if (spriteB instanceof Block && spriteA instanceof Laser) {
                 laserCollidesBlock((Laser)spriteA, (Block)spriteB);
+            }
+            else if (spriteA instanceof ExplodingBlock && spriteB instanceof Block) {
+                explodingBlockExplosion((ExplodingBlock) spriteA,(Block) spriteB);
+            }
+            else if (spriteB instanceof ExplodingBlock && spriteA instanceof Block) {
+                explodingBlockExplosion((ExplodingBlock) spriteB,(Block) spriteA);
             }
             return true;
         }
@@ -409,6 +434,14 @@ public class BreakoutGame extends GameWorld{
     private void laserCollidesBlock(Laser laser, Block block) {
         block.health = 0;
         block.removeFromScene(this);
-        getSpriteManager().addSpritesToBeRemoved(block);
+        if (!(block instanceof ExplodingBlock)) {
+            getSpriteManager().addSpritesToBeRemoved(block);
+        }
+    }
+
+    private void explodingBlockExplosion(ExplodingBlock eblock, Block block) {
+        block.removeFromScene(this);
+        getSceneNodes().getChildren().remove(block.node);
+        getSpriteManager().removeSprites(block);
     }
 }

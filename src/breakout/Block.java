@@ -6,7 +6,7 @@ import javafx.scene.image.ImageView;
 public class Block extends Sprite{
 
     public int health;
-    private final static double DEFAULT_SIZE = 75;
+    public final static double DEFAULT_SIZE = 75;
     private final static String BRICK_IMAGE = "brick3.gif";
     private final static String BRICK_IMAGE2 = "brick2.gif";
     private final static String BRICK_IMAGE3 = "brick5.gif";
@@ -22,16 +22,7 @@ public class Block extends Sprite{
 
     public Block(int health, double x, double y) {
         this.health = health;
-        Image image;
-        if (health==1){
-            image = new Image(this.getClass().getClassLoader().getResourceAsStream(BRICK_IMAGE));
-        }
-        else if (health==2) {
-            image = new Image(this.getClass().getClassLoader().getResourceAsStream(BRICK_IMAGE2));
-        }
-        else {
-            image = new Image(this.getClass().getClassLoader().getResourceAsStream(BRICK_IMAGE3));
-        }
+        Image image = assignImage(health);
 
         block = new ImageView(image);
         node = block;
@@ -43,6 +34,21 @@ public class Block extends Sprite{
 
         setSize(DEFAULT_SIZE);
     }
+
+    public Image assignImage(int health) {
+        Image image;
+        if (health ==1){
+            image = new Image(this.getClass().getClassLoader().getResourceAsStream(BRICK_IMAGE));
+        }
+        else if (health ==2) {
+            image = new Image(this.getClass().getClassLoader().getResourceAsStream(BRICK_IMAGE2));
+        }
+        else {
+            image = new Image(this.getClass().getClassLoader().getResourceAsStream(BRICK_IMAGE3));
+        }
+        return image;
+    }
+
     public void setSize(double size) {
         this.size = size;
         block.setFitWidth(size);
