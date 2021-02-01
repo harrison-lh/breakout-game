@@ -14,9 +14,10 @@ public class BreakoutGame extends GameWorld{
     private Block[] blocks;
     private Paddle paddle;
     private int remainingLives = 5;
-    private Text livesText, levelText;
+    private Text livesText, levelText, scoreText;
     private int levelNum = 1;
     private boolean gameOver = false;
+    private int score = 0;
 
     private static final int PADDLE_SPEED = 30;
     private static final double WINDOW_WIDTH = 600;
@@ -63,9 +64,12 @@ public class BreakoutGame extends GameWorld{
         livesText.setFont(new Font("Verdana", 10));
         levelText = new Text(10, 20, "Level: "+levelNum);
         levelText.setFont(new Font("Verdana", 10));
+        scoreText = new Text(290, 20, "Score: "+score);
+        scoreText.setFont(new Font("Verdana", 10));
 
         getSceneNodes().getChildren().add(0, livesText);
         getSceneNodes().getChildren().add(0, levelText);
+        getSceneNodes().getChildren().add(0, scoreText);
     }
 
     private void addPaddle() {
@@ -168,6 +172,7 @@ public class BreakoutGame extends GameWorld{
         if (gameOver) return;
         getSceneNodes().getChildren().remove(livesText);
         getSceneNodes().getChildren().remove(levelText);
+        getSceneNodes().getChildren().remove(scoreText);
         addText();
 
         if (toAddBall) {
@@ -204,17 +209,7 @@ public class BreakoutGame extends GameWorld{
             }
         }
         if (needsBlocks) {
-            if (ball != null) {
-                getSpriteManager().addSpritesToBeRemoved(ball);
-                getSceneNodes().getChildren().remove(ball.node);
-            }
-            for (Sprite sprite : getSpriteManager().getAllSprites()) {
-                if (sprite instanceof Laser || sprite instanceof PowerUp ||
-                    sprite instanceof Ball) {
-                    getSpriteManager().addSpritesToBeRemoved(sprite);
-                    getSceneNodes().getChildren().remove(sprite.node);
-                }
-            }
+            clearScene();
             if (levelNum >= 3) {
                 Text gameOverText = new Text(WINDOW_WIDTH/4,WINDOW_HEIGHT/2-75, "You Win!");
                 gameOverText.setFont(new Font("Verdana", 50));
@@ -229,6 +224,24 @@ public class BreakoutGame extends GameWorld{
             addBall();
         }
 
+    }
+
+    private void clearScene() {
+        for (Sprite sprite : getSpriteManager().getAllSprites()) {
+            if (sprite instanceof Laser || sprite instanceof PowerUp ||
+                sprite instanceof Ball || sprite instanceof Block) {
+                getSpriteManager().addSpritesToBeRemoved(sprite);
+                getSceneNodes().getChildren().remove(sprite.node);
+            }
+        }
+    }
+    private void clearBalls() {
+        for (Sprite sprite : getSpriteManager().getAllSprites()) {
+            if (sprite instanceof Ball) {
+                getSpriteManager().addSpritesToBeRemoved(sprite);
+                getSceneNodes().getChildren().remove(sprite.node);
+            }
+        }
     }
 
     @Override
@@ -322,6 +335,29 @@ public class BreakoutGame extends GameWorld{
         else if (code == KeyCode.S && !gameOver) {
             shootLaser();
         }
+        else if (code == KeyCode.DIGIT1) {
+            levelNum = 1;
+            clearScene();
+            constructLevel(1);
+            remainingLives++;
+        }
+        else if (code == KeyCode.DIGIT2) {
+            levelNum = 2;
+            clearScene();
+            constructLevel(2);
+            remainingLives++;
+        }
+        else if (code == KeyCode.DIGIT3) {
+            levelNum = 3;
+            clearScene();
+            constructLevel(3);
+            remainingLives++;
+        }
+        else if (code == KeyCode.R) {
+            paddle.setXPos(WINDOW_WIDTH/2);
+            clearBalls();
+            addBall();
+        }
     }
 
     @Override
@@ -407,6 +443,7 @@ public class BreakoutGame extends GameWorld{
         if (block.health <= 0) {
             block.removeFromScene(this);
             getSpriteManager().addSpritesToBeRemoved(block);
+            score++;
         }
     }
     private void powerUpCollidesPaddle(PowerUp powerup, Paddle paddle) {
@@ -434,6 +471,7 @@ public class BreakoutGame extends GameWorld{
     private void laserCollidesBlock(Laser laser, Block block) {
         block.health = 0;
         block.removeFromScene(this);
+        score++;
         if (!(block instanceof ExplodingBlock)) {
             getSpriteManager().addSpritesToBeRemoved(block);
         }

@@ -29,7 +29,8 @@ public class Ball extends Sprite{
         node.setTranslateY(node.getTranslateY() + yVelocity);
     }
     public void incrementSize() {
-        radius *= 1.0001;
+        radius *= 1.01;
+        if (radius > 15) radius = 15;
         ball.setRadius(radius);
     }
 
