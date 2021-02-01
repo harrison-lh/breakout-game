@@ -170,9 +170,7 @@ public class BreakoutGame extends GameWorld{
     @Override
     protected void resetScene() {
         if (gameOver) return;
-        getSceneNodes().getChildren().remove(livesText);
-        getSceneNodes().getChildren().remove(levelText);
-        getSceneNodes().getChildren().remove(scoreText);
+        removeText();
         addText();
 
         if (toAddBall) {
@@ -180,41 +178,21 @@ public class BreakoutGame extends GameWorld{
             toAddBall = false;
         }
 
-        boolean needsBall = true;
-        boolean needsBlocks = true;
-        Ball ball = null;
-        for (Sprite sprite : getSpriteManager().getAllSprites()) {
-            if (sprite instanceof Ball) {
-                needsBall = false;
-                ball = (Ball)sprite;
-            }
-            if (sprite instanceof Block) {
-                needsBlocks = false;
-            }
-            if (!needsBall && !needsBlocks) return;
-        }
-        if (needsBall) {
+        if (needsBall()) {
             remainingLives--;
             if (remainingLives > 0) {
                 addBall();
             }
             else {
-                getSceneNodes().getChildren().remove(livesText);
-                getSceneNodes().getChildren().remove(levelText);
+                removeText();
                 addText();
-                Text gameOverText = new Text(WINDOW_WIDTH/4,WINDOW_HEIGHT/2, "Game Over");
-                gameOverText.setFont(new Font("Verdana", 50));
-                getSceneNodes().getChildren().add(gameOverText);
-                gameOver = true;
+                gameOverText();
             }
         }
-        if (needsBlocks) {
+        if (needsBlocks()) {
             clearScene();
             if (levelNum >= 3) {
-                Text gameOverText = new Text(WINDOW_WIDTH/4,WINDOW_HEIGHT/2-75, "You Win!");
-                gameOverText.setFont(new Font("Verdana", 50));
-                getSceneNodes().getChildren().add(gameOverText);
-                gameOver = true;
+                youWinText();
                 return;
             }
             if (levelNum < 3) {
@@ -224,6 +202,43 @@ public class BreakoutGame extends GameWorld{
             addBall();
         }
 
+    }
+
+    private Boolean needsBall() {
+        for (Sprite sprite : getSpriteManager().getAllSprites()) {
+            if (sprite instanceof Ball) {
+                return false;
+            }
+        }
+        return true;
+    }
+    private Boolean needsBlocks() {
+        for (Sprite sprite : getSpriteManager().getAllSprites()) {
+            if (sprite instanceof Block) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void gameOverText() {
+        Text gameOverText = new Text(WINDOW_WIDTH/4,WINDOW_HEIGHT/2, "Game Over");
+        gameOverText.setFont(new Font("Verdana", 50));
+        getSceneNodes().getChildren().add(gameOverText);
+        gameOver = true;
+    }
+
+    private void removeText() {
+        getSceneNodes().getChildren().remove(livesText);
+        getSceneNodes().getChildren().remove(levelText);
+        getSceneNodes().getChildren().remove(scoreText);
+    }
+
+    private void youWinText() {
+        Text gameOverText = new Text(WINDOW_WIDTH/4,WINDOW_HEIGHT/2-75, "You Win!");
+        gameOverText.setFont(new Font("Verdana", 50));
+        getSceneNodes().getChildren().add(gameOverText);
+        gameOver = true;
     }
 
     private void clearScene() {
@@ -263,19 +278,7 @@ public class BreakoutGame extends GameWorld{
                 ball.incrementSize();
             }
 
-            if (ball.node.getTranslateX() + ball.radius >= WINDOW_WIDTH) {
-                ball.xVelocity = -1.0 * Math.abs(ball.xVelocity);
-            }
-            else if (ball.node.getTranslateX() - ball.radius <= 0) {
-                ball.xVelocity = Math.abs(ball.xVelocity);
-            }
-            if (ball.node.getTranslateY() - ball.radius < 0) {
-                ball.yVelocity = Math.abs(ball.yVelocity);
-            }
-
-            if (ball.node.getTranslateY() + ball.radius >= WINDOW_HEIGHT + 100) {
-                getSpriteManager().addSpritesToBeRemoved(sprite);
-            }
+            handleBallMovement(ball);
         }
         if (sprite instanceof PowerUp) {
             PowerUp powerup = (PowerUp)sprite;
@@ -303,28 +306,28 @@ public class BreakoutGame extends GameWorld{
 
     }
 
+    private void handleBallMovement(Ball ball) {
+        if (ball.node.getTranslateX() + ball.radius >= WINDOW_WIDTH) {
+            ball.xVelocity = -1.0 * Math.abs(ball.xVelocity);
+        }
+        else if (ball.node.getTranslateX() - ball.radius <= 0) {
+            ball.xVelocity = Math.abs(ball.xVelocity);
+        }
+        if (ball.node.getTranslateY() - ball.radius < 0) {
+            ball.yVelocity = Math.abs(ball.yVelocity);
+        }
+
+        if (ball.node.getTranslateY() + ball.radius >= WINDOW_HEIGHT + 100) {
+            getSpriteManager().addSpritesToBeRemoved(ball);
+        }
+    }
+
     private void handleKeyInput(KeyCode code) {
         if (code == KeyCode.RIGHT) {
-            lastDirectionInput = code;
-            timeSinceDirection = 0;
-            if (paddle.xPos >= getGameSurface().getWidth()-paddle.size) {
-                paddle.setXPos(0);
-            }
-            else {
-                paddle.setXPos(Math.min(
-                    getGameSurface().getWidth()-paddle.size,
-                    paddle.getXPos() + PADDLE_SPEED));
-            }
+            movePaddleRight(code);
         }
         else if (code == KeyCode.LEFT) {
-            lastDirectionInput = code;
-            timeSinceDirection = 0;
-            if (paddle.xPos <= 0) {
-                paddle.setXPos(getGameSurface().getWidth()-paddle.size);
-            }
-            else {
-                paddle.setXPos(Math.max(0, paddle.getXPos() - PADDLE_SPEED));
-            }
+            movePaddleLeft(code);
         }
         else if (code == KeyCode.L && remainingLives>0 && remainingLives<99) {
             remainingLives++;
@@ -336,27 +339,52 @@ public class BreakoutGame extends GameWorld{
             shootLaser();
         }
         else if (code == KeyCode.DIGIT1) {
-            levelNum = 1;
-            clearScene();
-            constructLevel(1);
-            remainingLives++;
+            changeToLevel(1);
         }
         else if (code == KeyCode.DIGIT2) {
-            levelNum = 2;
-            clearScene();
-            constructLevel(2);
-            remainingLives++;
+            changeToLevel(2);
         }
         else if (code == KeyCode.DIGIT3) {
-            levelNum = 3;
-            clearScene();
-            constructLevel(3);
-            remainingLives++;
+            changeToLevel(3);
         }
         else if (code == KeyCode.R) {
             paddle.setXPos(WINDOW_WIDTH/2);
             clearBalls();
             addBall();
+        }
+        else if (code == KeyCode.I) {
+            increasePaddleSize();
+        }
+    }
+
+    private void changeToLevel(int i) {
+        levelNum = i;
+        clearScene();
+        constructLevel(i);
+        remainingLives++;
+    }
+
+    private void movePaddleLeft(KeyCode code) {
+        lastDirectionInput = code;
+        timeSinceDirection = 0;
+        if (paddle.xPos <= 0) {
+            paddle.setXPos(getGameSurface().getWidth()-paddle.size);
+        }
+        else {
+            paddle.setXPos(Math.max(0, paddle.getXPos() - PADDLE_SPEED));
+        }
+    }
+
+    private void movePaddleRight(KeyCode code) {
+        lastDirectionInput = code;
+        timeSinceDirection = 0;
+        if (paddle.xPos >= getGameSurface().getWidth()-paddle.size) {
+            paddle.setXPos(0);
+        }
+        else {
+            paddle.setXPos(Math.min(
+                getGameSurface().getWidth()-paddle.size,
+                paddle.getXPos() + PADDLE_SPEED));
         }
     }
 
@@ -409,28 +437,26 @@ public class BreakoutGame extends GameWorld{
         }
         if (lastDirectionInput != null && ball.collidesUp(paddle)) {
             if (lastDirectionInput == KeyCode.LEFT) {
-                double newX = ball.xVelocity*Math.cos(-1 * DIRECTION_ROTATION) -
-                        ball.yVelocity*Math.sin(-1 * DIRECTION_ROTATION);
-                double newY = ball.xVelocity*Math.sin(-1 * DIRECTION_ROTATION) +
-                        ball.yVelocity*Math.cos(-1 * DIRECTION_ROTATION);
-                if (newX > MAX_BALL_SPEED_X || newX < -1 * MAX_BALL_SPEED_X)
-                    newX = MAX_BALL_SPEED_X * newX / Math.abs(newX);
-                ball.setXVelocity(newX);
-                ball.setYVelocity(Math.min(newY,-1 * MIN_BALL_SPEED_Y));
+                rotateBallMovement(ball, -1 * DIRECTION_ROTATION);
             }
             else if (lastDirectionInput == KeyCode.RIGHT) {
-                double newX = ball.xVelocity*Math.cos(DIRECTION_ROTATION) -
-                        ball.yVelocity*Math.sin(DIRECTION_ROTATION);
-                double newY = ball.xVelocity*Math.sin(DIRECTION_ROTATION) +
-                        ball.yVelocity*Math.cos(DIRECTION_ROTATION);
-                if (newX > MAX_BALL_SPEED_X || newX < -1 * MAX_BALL_SPEED_X)
-                    newX = MAX_BALL_SPEED_X * newX / Math.abs(newX);
-                ball.setXVelocity(newX);
-                ball.setYVelocity(Math.min(newY,-1 * MIN_BALL_SPEED_Y));
+                rotateBallMovement(ball, DIRECTION_ROTATION);
             }
             lastDirectionInput = null;
         }
     }
+
+    private void rotateBallMovement(Ball ball, double v) {
+        double newX = ball.xVelocity * Math.cos(v) -
+                ball.yVelocity * Math.sin(v);
+        double newY = ball.xVelocity * Math.sin(v) +
+                ball.yVelocity * Math.cos(v);
+        if (newX > MAX_BALL_SPEED_X || newX < -1 * MAX_BALL_SPEED_X)
+            newX = MAX_BALL_SPEED_X * newX / Math.abs(newX);
+        ball.setXVelocity(newX);
+        ball.setYVelocity(Math.min(newY, -1 * MIN_BALL_SPEED_Y));
+    }
+
     private void ballCollidesBlock(Ball ball, Block block) {
         if (ball.collidesX(block) &&
             (!ball.collidesY(block) || ball.collidesCornerX(block))) {
@@ -449,16 +475,22 @@ public class BreakoutGame extends GameWorld{
     private void powerUpCollidesPaddle(PowerUp powerup, Paddle paddle) {
         getSpriteManager().addSpritesToBeRemoved(powerup);
         getSceneNodes().getChildren().remove(powerup.node);
-        if (powerup.type==1 && !sizePowerupActive) {
-            paddle.setSize(paddle.getSize() * 1.5);
-            sizePowerupActive = true;
-            sizePowerupTime = 0;
+        if (powerup.type==1) {
+            increasePaddleSize();
         }
         if (powerup.type==2) {
             toAddBall = true;
         }
         if (powerup.type==3) {
             shootLaser();
+        }
+    }
+
+    private void increasePaddleSize() {
+        if (!sizePowerupActive) {
+            paddle.setSize(paddle.getSize() * 1.5);
+            sizePowerupActive = true;
+            sizePowerupTime = 0;
         }
     }
 
