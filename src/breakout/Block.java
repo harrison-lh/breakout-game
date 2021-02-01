@@ -8,6 +8,8 @@ public class Block extends Sprite{
     public int health;
     private final static double DEFAULT_SIZE = 75;
     private final static String BRICK_IMAGE = "brick3.gif";
+    private final static String BRICK_IMAGE2 = "brick2.gif";
+    private final static String BRICK_IMAGE3 = "brick5.gif";
     public double xPos, yPos;
     public double size;
     private ImageView block;
@@ -20,7 +22,17 @@ public class Block extends Sprite{
 
     public Block(int health, double x, double y) {
         this.health = health;
-        Image image = new Image(this.getClass().getClassLoader().getResourceAsStream(BRICK_IMAGE));
+        Image image;
+        if (health==1){
+            image = new Image(this.getClass().getClassLoader().getResourceAsStream(BRICK_IMAGE));
+        }
+        else if (health==2) {
+            image = new Image(this.getClass().getClassLoader().getResourceAsStream(BRICK_IMAGE2));
+        }
+        else {
+            image = new Image(this.getClass().getClassLoader().getResourceAsStream(BRICK_IMAGE3));
+        }
+
         block = new ImageView(image);
         node = block;
 

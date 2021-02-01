@@ -10,7 +10,7 @@ Start Date: 1/26/21
 
 Finish Date:
 
-Hours Spent: 2+1+4+3+.5
+Hours Spent: 2+1+4+3+.5+5+7.5
 
 ### Resources Used
 

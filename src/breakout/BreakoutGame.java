@@ -4,26 +4,19 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import java.util.Random;
-import javafx.animation.Timeline;
-import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.stage.Stage;
-import static javafx.animation.Animation.Status.RUNNING;
-import static javafx.animation.Animation.Status.STOPPED;
+import java.util.Random;
 
 public class BreakoutGame extends GameWorld{
 
     private Block[] blocks;
     private Paddle paddle;
     private int remainingLives = 5;
-    private Text livesText;
+    private Text livesText, levelText;
+    private int levelNum = 1;
+    private boolean gameOver = false;
 
     private static final int PADDLE_SPEED = 30;
     private static final double WINDOW_WIDTH = 600;
@@ -40,6 +33,7 @@ public class BreakoutGame extends GameWorld{
     private boolean sizePowerupActive = false;
     private static final int SIZE_POWERUP_TIME = 500;
     private int sizePowerupTime = SIZE_POWERUP_TIME;
+    private boolean toAddBall = false;
 
     public BreakoutGame(int fps, String title) {
         super(fps, title);
@@ -58,19 +52,20 @@ public class BreakoutGame extends GameWorld{
         addText();
         addPaddle();
         addBall();
-        constructLevelOne();
-
-        final Timeline gameloop = getGameLoop();
+        constructLevel(levelNum);
 
         primaryStage.getScene().setOnKeyPressed(e -> handleKeyInput(e.getCode()));
 
     }
 
     private void addText() {
-        livesText = new Text(10, 20, "Lives: "+remainingLives);
+        livesText = new Text(550, 20, "Lives: "+remainingLives);
         livesText.setFont(new Font("Verdana", 10));
-        
+        levelText = new Text(10, 20, "Level: "+levelNum);
+        levelText.setFont(new Font("Verdana", 10));
+
         getSceneNodes().getChildren().add(0, livesText);
+        getSceneNodes().getChildren().add(0, levelText);
     }
 
     private void addPaddle() {
@@ -100,33 +95,81 @@ public class BreakoutGame extends GameWorld{
         getSceneNodes().getChildren().add(0, ball.node);
     }
 
-    private void constructLevelOne() {
-        blocks = new Block[8*5];
-        for (int i=0; i<5; i++) {
-            for (int j = 0; j < 8; j++) {
-                if (i==3 && j==4) {
-                    blocks[8*3 + 4] = new Block(1,75*j,75+37.5*i, 1);
-                    getSpriteManager().addSprites(blocks[28].getPowerup());
-                    getSceneNodes().getChildren().add(0, blocks[28].getPowerup().node);
+    private void constructLevel(int levelNum) {
+        int rows, cols=8;
+        if (levelNum == 1) {
+            rows = 5;
+            blocks = new Block[rows * cols];
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                    if (i == 2 && j == 3) {
+                        blocks[cols * i + j] = new Block(2, 75 * j, 75 + 37.5 * i, 1);
+                        getSpriteManager().addSprites(blocks[cols*i + j].getPowerup());
+                        getSceneNodes().getChildren().add(0, blocks[cols*i + j].getPowerup().node);
+                    }
+                    else if ((i>=1 && i<=3) && (j>=2 && j<=5)) {
+                        blocks[cols * i + j] = new Block(2, 75 * j, 75 + 37.5 * i);
+                    }
+                    else blocks[cols * i + j] = new Block(1, 75 * j, 75 + 37.5 * i);
+                    getSpriteManager().addSprites(blocks[cols * i + j]);
+                    getSceneNodes().getChildren().add(0, blocks[cols * i + j].node);
                 }
-                else blocks[8 * i + j] = new Block(1, 75 * j, 75 + 37.5 * i);
-                if (i == 0) blocks[8 * i + j].health = 2;
-                getSpriteManager().addSprites(blocks[8 * i + j]);
-                getSceneNodes().getChildren().add(0, blocks[8 * i + j].node);
             }
+        }
+        if (levelNum==2) {
+            rows = 6;
+            blocks = new Block[rows * cols];
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                    if (i == 2 && j == 3) {
+                        blocks[cols * i + j] = new Block(2, 75 * j, 37.5 + 37.5 * i, 1);
+                        getSpriteManager().addSprites(blocks[cols*i + j].getPowerup());
+                        getSceneNodes().getChildren().add(0, blocks[cols*i + j].getPowerup().node);
+                    }
+                    else if ((i>=1 && i<=3) && (j>=2 && j<=5)) {
+                        blocks[cols * i + j] = new Block(3, 75 * j, 37.5 + 37.5 * i);
+                    }
+                    else blocks[cols * i + j] = new Block(1, 75 * j, 37.5 + 37.5 * i);
+                    getSpriteManager().addSprites(blocks[cols * i + j]);
+                    getSceneNodes().getChildren().add(0, blocks[cols * i + j].node);
+                }
+            }
+        }
+        if (levelNum==3) {
+            Random generator = new Random();
+            rows = 7;
+            blocks = new Block[rows*cols];
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                    double rand = generator.nextDouble();
+                    if (rand<.1) {
+                        blocks[cols * i + j] = new Block(2, 75 * j, 37.5 + 37.5 * i,
+                                generator.nextInt(2)+1);
+                        getSpriteManager().addSprites(blocks[cols*i + j].getPowerup());
+                        getSceneNodes().getChildren().add(0, blocks[cols*i + j].getPowerup().node);
+                    }
+                    else if (rand<.4) {
+                        blocks[cols * i + j] = new Block(3, 75 * j, 37.5 + 37.5 * i);
+                    }
+                    else blocks[cols * i + j] = new Block(1, 75 * j, 37.5 + 37.5 * i);
+                    getSpriteManager().addSprites(blocks[cols * i + j]);
+                    getSceneNodes().getChildren().add(0, blocks[cols * i + j].node);
+                }
+            }
+
         }
     }
 
     @Override
     protected void resetScene() {
+        if (gameOver) return;
         getSceneNodes().getChildren().remove(livesText);
+        getSceneNodes().getChildren().remove(levelText);
         addText();
 
-        if (remainingLives <= 0) {
-            Text gameOver = new Text(WINDOW_WIDTH/4,WINDOW_HEIGHT/2, "Game Over");
-            gameOver.setFont(new Font("Verdana", 50));
-            getSceneNodes().getChildren().add(gameOver);
-            return;
+        if (toAddBall) {
+            addBall();
+            toAddBall = false;
         }
 
         boolean needsBall = true;
@@ -142,13 +185,34 @@ public class BreakoutGame extends GameWorld{
             }
             if (!needsBall && !needsBlocks) return;
         }
-        if (needsBall) addBall();
+        if (needsBall) {
+            remainingLives--;
+            if (remainingLives > 0) {
+                addBall();
+            }
+            else {
+                Text gameOverText = new Text(WINDOW_WIDTH/4,WINDOW_HEIGHT/2, "Game Over");
+                gameOverText.setFont(new Font("Verdana", 50));
+                getSceneNodes().getChildren().add(gameOverText);
+                gameOver = true;
+            }
+        }
         if (needsBlocks) {
             if (ball != null) {
                 getSpriteManager().removeSprites(ball);
                 getSceneNodes().getChildren().remove(ball.node);
             }
-            constructLevelOne();
+            if (levelNum >= 3) {
+                Text gameOverText = new Text(WINDOW_WIDTH/4,WINDOW_HEIGHT/2-75, "You Win!");
+                gameOverText.setFont(new Font("Verdana", 50));
+                getSceneNodes().getChildren().add(gameOverText);
+                gameOver = true;
+                return;
+            }
+            if (levelNum < 3) {
+                levelNum++;
+                constructLevel(levelNum);
+            }
             addBall();
         }
 
@@ -182,7 +246,6 @@ public class BreakoutGame extends GameWorld{
 
             if (ball.node.getTranslateY() + ball.radius >= WINDOW_HEIGHT + 100) {
                 getSpriteManager().addSpritesToBeRemoved(sprite);
-                remainingLives--;
             }
         }
         if (sprite instanceof PowerUp) {
@@ -222,8 +285,11 @@ public class BreakoutGame extends GameWorld{
                 paddle.setXPos(Math.max(0, paddle.getXPos() - PADDLE_SPEED));
             }
         }
-        else if (code == KeyCode.L && remainingLives>0) {
+        else if (code == KeyCode.L && remainingLives>0 && remainingLives<99) {
             remainingLives++;
+        }
+        else if (code == KeyCode.B && !gameOver) {
+            addBall();
         }
     }
 
@@ -307,6 +373,9 @@ public class BreakoutGame extends GameWorld{
             paddle.setSize(paddle.getSize() * 1.5);
             sizePowerupActive = true;
             sizePowerupTime = 0;
+        }
+        if (powerup.type==2) {
+            toAddBall = true;
         }
     }
 }
