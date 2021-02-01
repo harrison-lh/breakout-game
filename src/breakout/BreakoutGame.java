@@ -103,7 +103,7 @@ public class BreakoutGame extends GameWorld{
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < cols; j++) {
                     if (i == 2 && j == 3) {
-                        blocks[cols * i + j] = new Block(2, 75 * j, 75 + 37.5 * i, 1);
+                        blocks[cols * i + j] = new Block(2, 75 * j, 75 + 37.5 * i, 3);
                         getSpriteManager().addSprites(blocks[cols*i + j].getPowerup());
                         getSceneNodes().getChildren().add(0, blocks[cols*i + j].getPowerup().node);
                     }
@@ -144,7 +144,7 @@ public class BreakoutGame extends GameWorld{
                     double rand = generator.nextDouble();
                     if (rand<.1) {
                         blocks[cols * i + j] = new Block(2, 75 * j, 37.5 + 37.5 * i,
-                                generator.nextInt(2)+1);
+                                generator.nextInt(3)+1);
                         getSpriteManager().addSprites(blocks[cols*i + j].getPowerup());
                         getSceneNodes().getChildren().add(0, blocks[cols*i + j].getPowerup().node);
                     }
@@ -191,6 +191,9 @@ public class BreakoutGame extends GameWorld{
                 addBall();
             }
             else {
+                getSceneNodes().getChildren().remove(livesText);
+                getSceneNodes().getChildren().remove(levelText);
+                addText();
                 Text gameOverText = new Text(WINDOW_WIDTH/4,WINDOW_HEIGHT/2, "Game Over");
                 gameOverText.setFont(new Font("Verdana", 50));
                 getSceneNodes().getChildren().add(gameOverText);
@@ -258,6 +261,12 @@ public class BreakoutGame extends GameWorld{
         if (sprite instanceof Block) {
             sprite.update();
         }
+        if (sprite instanceof Laser) {
+            sprite.update();
+            if (((Laser)sprite).getLaser().getY() + ((Laser)sprite).getLaser().getHeight() < 0) {
+                getSpriteManager().addSpritesToBeRemoved(sprite);
+            }
+        }
 
 
     }
@@ -291,6 +300,9 @@ public class BreakoutGame extends GameWorld{
         else if (code == KeyCode.B && !gameOver) {
             addBall();
         }
+        else if (code == KeyCode.S && !gameOver) {
+            shootLaser();
+        }
     }
 
     @Override
@@ -313,6 +325,12 @@ public class BreakoutGame extends GameWorld{
             }
             else if (spriteB instanceof Paddle && spriteA instanceof PowerUp) {
                 powerUpCollidesPaddle((PowerUp)spriteA, (Paddle)spriteB);
+            }
+            else if (spriteA instanceof Block && spriteB instanceof Laser) {
+                laserCollidesBlock((Laser)spriteB, (Block)spriteA);
+            }
+            else if (spriteB instanceof Block && spriteA instanceof Laser) {
+                laserCollidesBlock((Laser)spriteA, (Block)spriteB);
             }
             return true;
         }
@@ -377,5 +395,20 @@ public class BreakoutGame extends GameWorld{
         if (powerup.type==2) {
             toAddBall = true;
         }
+        if (powerup.type==3) {
+            shootLaser();
+        }
+    }
+
+    private void shootLaser() {
+        Laser laser = new Laser(paddle.xPos+paddle.getSize()/2,paddle.yPos);
+        getSceneNodes().getChildren().add(laser.node);
+        getSpriteManager().addSprites(laser);
+    }
+
+    private void laserCollidesBlock(Laser laser, Block block) {
+        block.health = 0;
+        block.removeFromScene(this);
+        getSpriteManager().addSpritesToBeRemoved(block);
     }
 }
