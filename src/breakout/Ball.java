@@ -1,12 +1,6 @@
 package breakout;
 
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.RadialGradient;
-import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
-import javafx.util.Duration;
 
 public class Ball extends Sprite{
 
