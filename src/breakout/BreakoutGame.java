@@ -31,7 +31,7 @@ public class BreakoutGame extends GameWorld{
     private static final double DIRECTION_ROTATION = Math.toRadians(15);
 
     private boolean sizePowerupActive = false;
-    private static final int SIZE_POWERUP_TIME = 500;
+    private static final int SIZE_POWERUP_TIME = 1000;
     private int sizePowerupTime = SIZE_POWERUP_TIME;
     private boolean toAddBall = false;
 
