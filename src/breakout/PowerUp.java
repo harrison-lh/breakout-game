@@ -3,6 +3,12 @@ package breakout;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
+/**
+ * The power-up, normally created as a part of the block, falls when the block is destroyed.
+ * When it collides with the paddle, it gives the player some sort of power-up.
+ *
+ * @author harrisonh
+ */
 public class PowerUp extends Sprite {
 
     private static final double FALL_SPEED = 2;
@@ -17,6 +23,14 @@ public class PowerUp extends Sprite {
     public boolean canMove = false;
     public int type;
 
+    /**
+     * Creates new PowerUp object, with specifications of where to place it
+     * and what type it is, in other words what power-up it gives to the
+     * player after it is obtained.
+     * @param x starting x position
+     * @param y starting y position
+     * @param type type of power-up (size = 1, ball = 2, laser = 3)
+     */
     public PowerUp(double x, double y, int type) {
         Image image;
         this.type = type;
@@ -36,7 +50,9 @@ public class PowerUp extends Sprite {
         powerup.setY(y);
     }
 
-
+    /**
+     * Changes the position of the power-up if its corresponding block has broken.
+     */
     @Override
     public void update() {
         if (canMove) {
@@ -44,6 +60,11 @@ public class PowerUp extends Sprite {
         }
     }
 
+    /**
+     * Determines if power-up has collided with the paddle.
+     * @param other other Sprite with which to check collision
+     * @return boolean, true if power-up collides paddle
+     */
     @Override
     public boolean collide(Sprite other) {
         if (other instanceof Paddle) {

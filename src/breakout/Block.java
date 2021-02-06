@@ -3,6 +3,12 @@ package breakout;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
+/**
+ * The block is an implementation of the sprite class. Properties of blocks are that they are stationary,
+ * have a certain amount of health when hit by balls, and some contain power-ups.
+ *
+ * @author harrisonh
+ */
 public class Block extends Sprite{
 
     public int health;
@@ -15,11 +21,24 @@ public class Block extends Sprite{
     private ImageView block;
     private PowerUp powerup;
 
+    /**
+     * Initializes a block containing a power-up.
+     * @param health amount of hits the block takes before breaking
+     * @param x X location of the block
+     * @param y Y location of the block
+     * @param powerupType the type of power-up the block contains
+     */
     public Block(int health, double x, double y, int powerupType) {
         this(health, x, y);
         powerup = new PowerUp(x + size/2 - 5, y + block.getFitHeight()*1/3, powerupType);
     }
 
+    /**
+     * Initializes a block without a power-up.
+     * @param health amount of hits the block takes before breaking
+     * @param x X location of the block
+     * @param y Y location of the block
+     */
     public Block(int health, double x, double y) {
         this.health = health;
         Image image = assignImage(health);
@@ -35,6 +54,11 @@ public class Block extends Sprite{
         setSize(DEFAULT_SIZE);
     }
 
+    /**
+     * Assigns an image to the block based on its health.
+     * @param health health of the block
+     * @return Image object corresponding to its initial health
+     */
     public Image assignImage(int health) {
         Image image;
         if (health ==1){
@@ -49,12 +73,19 @@ public class Block extends Sprite{
         return image;
     }
 
+    /**
+     * Changes the size of the block, maintaining both its dimensions.
+     * @param size scale to which the block is set, sets width of the block
+     */
     public void setSize(double size) {
         this.size = size;
         block.setFitWidth(size);
         block.setFitHeight(size/2);
     }
 
+    /**
+     * Marks itself as dead if its health goes to zero, and releases the power-up if it exists.
+     */
     @Override
     public void update() {
         if (health<=0) {
@@ -65,12 +96,24 @@ public class Block extends Sprite{
         }
     }
 
+    /**
+     * Getter method for the block's ImageView object.
+     * @return ImageView object of block
+     */
     public ImageView getBlock() {
         return block;
     }
 
+    /**
+     * Getter method for the power-up that the block contains.
+     * @return PowerUp object
+     */
     public PowerUp getPowerup() { return powerup; }
 
+    /**
+     * Removes the block from the game given that the block has died.
+     * @param gameWorld Breakout game from which to remove the block
+     */
     public void removeFromScene(final GameWorld gameWorld) {
         update();
         isDead = true;

@@ -9,6 +9,12 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+/**
+ * This application demonstrates a JavaFX Game Loop.
+ *
+ * @author harrisonh
+ */
+
 public abstract class GameWorld {
 
     private Scene gameSurface;
@@ -34,6 +40,9 @@ public abstract class GameWorld {
         buildAndSetGameLoop();
     }
 
+    /**
+     * Creates game loop and performs actions that take place within each frame.
+     */
     protected final void buildAndSetGameLoop() {
 
         final Duration oneFrameAmt = Duration.millis(1000/getFramesPerSecond());
@@ -59,6 +68,9 @@ public abstract class GameWorld {
 
     }
 
+    /**
+     * Performs auxiliary actions to reset the scene as needed by the game mechanics.
+     */
     protected abstract void resetScene();
 
     /**
@@ -67,16 +79,27 @@ public abstract class GameWorld {
      */
     public abstract void initialize(final Stage primaryStage);
 
+    /**
+     * Starts the game loop.
+     */
     public void beginGameLoop() {
         getGameLoop().play();
     }
 
+    /**
+     * Calls on all the sprites to be updated, used by game loop once per frame.
+     */
     protected void updateSprites() {
         for (Sprite sprite:spriteManager.getAllSprites()){
             handleUpdate(sprite);
         }
     }
 
+    /**
+     * Method to update each Sprite, depending on the type of Sprite.
+     * Implementation to be determined by the subclass.
+     * @param sprite Sprite to be updated
+     */
     protected void handleUpdate(Sprite sprite) {
     }
 
@@ -115,42 +138,81 @@ public abstract class GameWorld {
         return false;
     }
 
+    /**
+     * Calls on sprite manager to remove sprites queued to be removed.
+     */
     protected void cleanupSprites() {
         spriteManager.cleanupSprites();
     }
 
+    /**
+     * Returns the frames per second of the game.
+     * @return fps of the game
+     */
     protected int getFramesPerSecond() {
         return framesPerSecond;
     }
 
+    /**
+     * Returns the title of the window.
+     * @return Title of the window
+     */
     public String getWindowTitle() {
         return windowTitle;
     }
 
+    /**
+     * Getter method for returning the game loop
+     * @return game loop
+     */
     protected static Timeline getGameLoop() {
         return gameLoop;
     }
 
+    /**
+     * Setter method for the game loop
+     * @param gameLoop game loop to be set
+     */
     protected static void setGameLoop(Timeline gameLoop) {
         GameWorld.gameLoop = gameLoop;
     }
 
+    /**
+     * Getter method for the sprite manager
+     * @return sprite manager object for the game world
+     */
     protected SpriteManager getSpriteManager() {
         return spriteManager;
     }
 
+    /**
+     * Getter method for the game surface/scene
+     * @return Scene object
+     */
     public Scene getGameSurface() {
         return gameSurface;
     }
 
+    /**
+     * Setter method for the game surface/scene
+     * @param gameSurface Scene object to set
+     */
     protected void setGameSurface(Scene gameSurface) {
         this.gameSurface = gameSurface;
     }
 
+    /**
+     * Returns Group object containing all of the nodes in the current scene.
+     * @return Group with all current nodes
+     */
     public Group getSceneNodes() {
         return sceneNodes;
     }
 
+    /**
+     * Overwrites all the nodes in the current scene with the input Group
+     * @param sceneNodes Group of nodes to overwrite the current nodes
+     */
     protected void setSceneNodes(Group sceneNodes) {
         this.sceneNodes = sceneNodes;
     }

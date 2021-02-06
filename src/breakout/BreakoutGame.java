@@ -9,6 +9,13 @@ import javafx.scene.Scene;
 import javafx.scene.shape.Circle;
 import java.util.Random;
 
+/**
+ * The Breakout Game, made using JavaFX, pits a player armed with a paddle, a ball, and occasional
+ * lasers to break blocks and advance through the three levels. Players can move the paddle with
+ * arrow keys to keep the ball afloat for as long as possible.
+ *
+ * @author harrisonh
+ */
 public class BreakoutGame extends GameWorld{
 
     private Block[] blocks;
@@ -36,11 +43,19 @@ public class BreakoutGame extends GameWorld{
     private int sizePowerupTime = SIZE_POWERUP_TIME;
     private boolean toAddBall = false;
 
+    /**
+     * Creates a new Breakout Game.
+     * @param fps frames per second
+     * @param title the title of the window
+     */
     public BreakoutGame(int fps, String title) {
         super(fps, title);
     }
 
-
+    /**
+     * Initializes the window and creates the opening layout.
+     * @param primaryStage Stage object
+     */
     @Override
     public void initialize(Stage primaryStage) {
 
@@ -167,6 +182,11 @@ public class BreakoutGame extends GameWorld{
         }
     }
 
+    /**
+     * Resolves issue with the game if certain elements are absent. Adds ball if absent, moves to the
+     * next level if all bricks are broken, ends game if the third level is beaten or if the player
+     * has no lives remaining.
+     */
     @Override
     protected void resetScene() {
         if (gameOver) return;
@@ -259,6 +279,11 @@ public class BreakoutGame extends GameWorld{
         }
     }
 
+    /**
+     * Updates and/or moves sprites as desired for every frame.
+     * Balls reflect off of the window. Power-ups fall, and lasers rise.
+     * @param sprite Sprite to be updated
+     */
     @Override
     protected void handleUpdate(Sprite sprite) {
         if (sprite instanceof Ball) {
@@ -388,6 +413,12 @@ public class BreakoutGame extends GameWorld{
         }
     }
 
+    /**
+     * Takes action for collision between any two sprites.
+     * @param spriteA - called from checkCollision() method to be compared.
+     * @param spriteB - called from checkCollision() method to be compared.
+     * @return
+     */
     @Override
     protected boolean handleCollision(Sprite spriteA, Sprite spriteB) {
         if (spriteA.collide(spriteB)) {
