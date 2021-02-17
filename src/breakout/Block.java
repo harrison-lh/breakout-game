@@ -75,7 +75,7 @@ public class Block extends Sprite{
 
     /**
      * Changes the size of the block, maintaining both its dimensions.
-     * @param size scale to which the block is set, sets width of the block
+     * @param size
      */
     public void setSize(double size) {
         this.size = size;
@@ -83,9 +83,6 @@ public class Block extends Sprite{
         block.setFitHeight(size/2);
     }
 
-    /**
-     * Marks itself as dead if its health goes to zero, and releases the power-up if it exists.
-     */
     @Override
     public void update() {
         if (health<=0) {
@@ -96,24 +93,12 @@ public class Block extends Sprite{
         }
     }
 
-    /**
-     * Getter method for the block's ImageView object.
-     * @return ImageView object of block
-     */
     public ImageView getBlock() {
         return block;
     }
 
-    /**
-     * Getter method for the power-up that the block contains.
-     * @return PowerUp object
-     */
     public PowerUp getPowerup() { return powerup; }
 
-    /**
-     * Removes the block from the game given that the block has died.
-     * @param gameWorld Breakout game from which to remove the block
-     */
     public void removeFromScene(final GameWorld gameWorld) {
         update();
         isDead = true;
