@@ -22,7 +22,7 @@
     - My implementation to create new levels is also somewhat repetitive, but
       that problem is better solved by implementing level import from a data file.
 
-###Methods: 
+### Methods: 
 ```java
 private void ballCollidesPaddle(Ball ball, Paddle paddle)
 ```
@@ -50,7 +50,7 @@ all of what this method does. This method is not described by GIT commit message
 anywhere, as it was one that was continuously updated over time, as opposed to being
 written once and touched little thereafter. 
 
-###Conclusion
+### Conclusion
 
 I think I was moderately successful at making my code readable, though I likely
 need even some amount of inline comments to clarify some lines. I have very little
